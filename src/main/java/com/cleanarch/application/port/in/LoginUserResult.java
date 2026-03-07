@@ -1,10 +1,10 @@
-package com.cleanarch.adapters.in.web.dto;
+package com.cleanarch.application.port.in;
 
 import java.util.UUID;
 
-public record LoginUserResponse(
+public record LoginUserResult(
         String accessToken,
         String refreshToken,
         UUID userId,
         String role
-){ }
+) { }

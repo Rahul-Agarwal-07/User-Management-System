@@ -1,7 +1,10 @@
 package com.cleanarch.application.port.out;
 
+import java.util.UUID;
+
 public interface TokenGeneratorPort {
 
-    String generateToken(String secretKey, String uniqueId);
+    String generateAccessToken(UUID userId, String role);
+    String generateRefreshToken(UUID userId);
 
 }

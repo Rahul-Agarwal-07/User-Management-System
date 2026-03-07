@@ -5,6 +5,7 @@ import com.cleanarch.adapters.in.web.dto.CreateUserResponse;
 import com.cleanarch.application.port.in.CreateUserCommand;
 import com.cleanarch.application.port.in.CreateUserUseCasePort;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,7 +25,7 @@ public class UserController {
     }
 
     @PostMapping
-    public CreateUserResponse createUser(@Valid @RequestBody CreateUserRequest request)
+    public ResponseEntity<CreateUserResponse> createUser(@Valid @RequestBody CreateUserRequest request)
     {
         UUID id = createUserUseCase.execute(
                 new CreateUserCommand(
@@ -35,7 +36,9 @@ public class UserController {
                 )
         );
 
-        return new CreateUserResponse(id);
+        return ResponseEntity.ok(
+                new CreateUserResponse(id)
+        );
     }
 
 }
