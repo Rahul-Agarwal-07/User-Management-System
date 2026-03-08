@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public interface TokenGeneratorPort {
 
-    String generateAccessToken(UUID userId, String role);
+    String generateAccessToken(UUID userId, UUID sessionId, String role);
     String generateRefreshToken(UUID userId);
 
 }

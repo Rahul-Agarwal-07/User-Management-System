@@ -23,7 +23,7 @@ public class Session {
 
     private Session() {}
 
-    public static Session create(UUID userId, String refreshTokenHash)
+    public static Session create(UUID userId, String refreshTokenHash, Instant expiresAt)
     {
         Session session = new Session();
 
@@ -37,7 +37,7 @@ public class Session {
 
         session.createdAt = Instant.now();
         session.lastUsedAt = Instant.now();
-        session.expiresAt = Instant.now().plusSeconds(30L * 24 * 60 * 60);
+        session.expiresAt = expiresAt;
 
         return session;
     }
@@ -112,6 +112,11 @@ public class Session {
     public Instant getExpiresAt()
     {
         return this.expiresAt;
+    }
+
+    public Instant getCreatedAt()
+    {
+        return this.createdAt;
     }
 
 }

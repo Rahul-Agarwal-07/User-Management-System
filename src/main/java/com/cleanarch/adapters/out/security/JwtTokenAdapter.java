@@ -22,12 +22,13 @@ public class JwtTokenAdapter implements TokenGeneratorPort {
     }
 
     @Override
-    public String generateAccessToken(UUID userId, String role) {
+    public String generateAccessToken(UUID userId, UUID sessionId, String role) {
 
         Instant now = Instant.now();
 
         return Jwts.builder()
                 .subject(userId.toString())
+                .claim("sid", sessionId)
                 .claim("role", role)
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plusSeconds(accessTokenExpiration)))

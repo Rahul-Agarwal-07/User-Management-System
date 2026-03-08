@@ -1,26 +1,34 @@
 package com.cleanarch.application.usecases;
 
-import com.cleanarch.adapters.in.web.dto.LoginUserResponse;
 import com.cleanarch.application.port.in.LoginUseCasePort;
 import com.cleanarch.application.port.in.LoginUserCommand;
 import com.cleanarch.application.port.in.LoginUserResult;
-import com.cleanarch.application.port.out.PasswordHasherPort;
-import com.cleanarch.application.port.out.TokenGeneratorPort;
-import com.cleanarch.application.port.out.UserRepositoryPort;
+import com.cleanarch.application.port.out.*;
 import com.cleanarch.domain.exception.InvalidCredentialsException;
+import com.cleanarch.domain.model.Session;
 import com.cleanarch.domain.model.User;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
+import java.util.List;
 
 public class LoginUserUseCase implements LoginUseCasePort {
 
+    private static final int MAX_SESSIONS = 3;
 
     private final UserRepositoryPort userRepository;
+    private final SessionRepositoryPort sessionRepository;
     private final TokenGeneratorPort tokenGenerator;
     private final PasswordHasherPort passwordHasher;
+    private final TokenHasherPort tokenHasher;
 
-    public LoginUserUseCase(UserRepositoryPort userRepository,TokenGeneratorPort tokenGenerator, PasswordHasherPort passwordHasher) {
+    public LoginUserUseCase(UserRepositoryPort userRepository, SessionRepositoryPort sessionRepository, TokenGeneratorPort tokenGenerator, PasswordHasherPort passwordHasher, TokenHasherPort tokenHasher) {
         this.userRepository = userRepository;
+        this.sessionRepository = sessionRepository;
         this.tokenGenerator = tokenGenerator;
         this.passwordHasher = passwordHasher;
+        this.tokenHasher = tokenHasher;
     }
 
     @Override
@@ -35,9 +43,41 @@ public class LoginUserUseCase implements LoginUseCasePort {
 
         if(!valid) throw new InvalidCredentialsException("Invalid Email or Password");
 
-        //generate tokens (access, refresh)
-        String accessToken = tokenGenerator.generateAccessToken(user.getId(), user.getStatus().name());
+        // Fetching all the active sessions of user
+        List<Session> sessions = sessionRepository.findActiveSessionsByUserId(user.getId());
+
+        // Enforce Session Limit
+        if(sessions.size() >= MAX_SESSIONS)
+        {
+            Session oldest = sessions.stream()
+                    .min(Comparator.comparing(Session::getCreatedAt))
+                    .orElseThrow();
+
+            oldest.revoke();
+
+            sessionRepository.save(oldest);
+        }
+
+        // Generate Refresh Token and Token hash
         String refreshToken = tokenGenerator.generateRefreshToken(user.getId());
+        String refreshTokenHash = tokenHasher.hash(refreshToken);
+
+
+        // Create new Session
+        Session session = Session.create(
+                user.getId(),
+                refreshTokenHash,
+                Instant.now().plus(30, ChronoUnit.DAYS)
+        );
+
+        sessionRepository.save(session);
+
+        // Generate Access Token
+        String accessToken = tokenGenerator.generateAccessToken(
+                user.getId(),
+                session.getSessionId(),
+                user.getStatus().name()
+        );
 
         return new LoginUserResult(
                 accessToken,
