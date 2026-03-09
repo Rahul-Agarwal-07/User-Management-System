@@ -76,7 +76,7 @@ public class LoginUserUseCase implements LoginUseCasePort {
         String accessToken = tokenGenerator.generateAccessToken(
                 user.getId(),
                 session.getSessionId(),
-                user.getStatus().name()
+                "USER"
         );
 
         return new LoginUserResult(

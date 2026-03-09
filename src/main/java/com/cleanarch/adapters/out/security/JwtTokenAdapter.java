@@ -11,7 +11,6 @@ import java.util.UUID;
 
 public class JwtTokenAdapter implements TokenGeneratorPort {
 
-
     private final SecretKey key;
 
     private final long accessTokenExpiration = 15 * 60;

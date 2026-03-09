@@ -15,31 +15,92 @@ public class Session {
     private String currTokenHash;
     private String prevTokenHash;
 
+    private String userAgent;
+    private String ipAddress;
+    private String deviceId;
+
     private Instant createdAt;
     private Instant lastUsedAt;
     private Instant expiresAt;
 
     private SessionStatus status;
 
-    private Session() {}
+    private Session(
+            UUID sessionId,
+            UUID userId,
+            String currRefreshTokenHash,
+            String prevRefreshTokenHash,
+            SessionStatus status,
+            Instant createdAt,
+            Instant expiresAt,
+            Instant lastUsedAt,
+            String deviceId,
+            String ipAddress,
+            String userAgent
+    ) {
+        this.sessionId = sessionId;
+        this.userId = userId;
+        this.currTokenHash = currRefreshTokenHash;
+        this.prevTokenHash = prevRefreshTokenHash;
+        this.status = status;
+        this.createdAt = createdAt;
+        this.expiresAt = expiresAt;
+        this.lastUsedAt = lastUsedAt;
+        this.deviceId = deviceId;
+        this.ipAddress = ipAddress;
+        this.userAgent = userAgent;
+    }
 
-    public static Session create(UUID userId, String refreshTokenHash, Instant expiresAt)
+    public static Session create(
+            UUID userId,
+            String refreshTokenHash,
+            Instant expiresAt,
+            String deviceId,
+            String ipAddress,
+            String userAgent
+    )
     {
-        Session session = new Session();
+        return new Session(
+                UUID.randomUUID(),
+                userId,
+                refreshTokenHash,
+                null,
+                SessionStatus.ACTIVE,
+                Instant.now(),
+                expiresAt,
+                Instant.now(),
+                deviceId,
+                ipAddress,
+                userAgent
+        );
+    }
 
-        session.sessionId = UUID.randomUUID();
-        session.userId = userId;
-
-        session.currTokenHash = refreshTokenHash;
-        session.prevTokenHash = null;
-
-        session.status = SessionStatus.ACTIVE;
-
-        session.createdAt = Instant.now();
-        session.lastUsedAt = Instant.now();
-        session.expiresAt = expiresAt;
-
-        return session;
+    public static Session restore(
+            UUID sessionId,
+            UUID userId,
+            String currRefreshTokenHash,
+            String prevRefreshTokenHash,
+            String status,
+            Instant createdAt,
+            Instant expiresAt,
+            Instant lastUsedAt,
+            String deviceId,
+            String ipAddress,
+            String userAgent
+    ){
+        return new Session(
+                sessionId,
+                userId,
+                currRefreshTokenHash,
+                prevRefreshTokenHash,
+                SessionStatus.valueOf(status),
+                createdAt,
+                expiresAt,
+                lastUsedAt,
+                deviceId,
+                ipAddress,
+                userAgent
+        );
     }
 
     public void verifyRefreshToken(String tokenHash)
@@ -104,6 +165,10 @@ public class Session {
         return this.userId;
     }
 
+    public String getCurrTokenHash() { return this.currTokenHash; }
+
+    public String getPrevTokenHash() { return this.prevTokenHash; }
+
     public SessionStatus getStatus()
     {
         return this.status;
@@ -118,5 +183,13 @@ public class Session {
     {
         return this.createdAt;
     }
+
+    public Instant getLastUsedAt() { return this.lastUsedAt; }
+
+    public String getUserAgent() { return this.userAgent; }
+
+    public String getIpAddress() { return this.ipAddress; }
+
+    public String getDeviceId() { return this.deviceId; }
 
 }

@@ -1,6 +1,7 @@
 package com.cleanarch.adapters.out.security;
 
 import com.cleanarch.application.port.out.PasswordHasherPort;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -8,10 +9,10 @@ import org.springframework.stereotype.Component;
 public class BcryptPasswordHasherAdapter implements PasswordHasherPort {
 
 
-    private final PasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    public BcryptPasswordHasherAdapter(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
+    public BcryptPasswordHasherAdapter(BcryptPasswordHasherAdapter passwordEncoder) {
+        this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
     @Override
@@ -21,6 +22,7 @@ public class BcryptPasswordHasherAdapter implements PasswordHasherPort {
 
     @Override
     public boolean matches(String rawPass, String passHash) {
+
         return passwordEncoder.matches(rawPass, passHash);
     }
 }
