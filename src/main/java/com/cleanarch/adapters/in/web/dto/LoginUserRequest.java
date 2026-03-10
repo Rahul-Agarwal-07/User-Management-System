@@ -7,5 +7,5 @@ public record LoginUserRequest(
         @NotBlank @Email String email,
         @NotBlank String password,
         @NotBlank String deviceId,
-        @NotBlank String ipAddress
+        @NotBlank String userAgent
 ) { }

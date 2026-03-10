@@ -52,6 +52,7 @@ public class Session {
     }
 
     public static Session create(
+            UUID sessionId,
             UUID userId,
             String refreshTokenHash,
             Instant expiresAt,
@@ -61,7 +62,7 @@ public class Session {
     )
     {
         return new Session(
-                UUID.randomUUID(),
+                sessionId,
                 userId,
                 refreshTokenHash,
                 null,

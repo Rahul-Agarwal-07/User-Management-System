@@ -1,8 +1,7 @@
 package com.cleanarch.adapters.in.web;
 
 import com.cleanarch.adapters.in.web.dto.ApiError;
-import com.cleanarch.domain.exception.InvalidUserDataException;
-import com.cleanarch.domain.exception.UserAlreadyExistsException;
+import com.cleanarch.domain.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -31,8 +30,43 @@ public class GlobalExceptionHandler {
                 .body(new ApiError(exp.getMessage()));
     }
 
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ApiError> handleInvalidCredentialsException(InvalidCredentialsException exp)
+    {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(new ApiError(exp.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidRefreshTokenException.class)
+    public ResponseEntity<ApiError> handleInvalidRefreshTokenException(InvalidRefreshTokenException exp)
+    {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(new ApiError(exp.getMessage()));
+    }
+
+    @ExceptionHandler(SecurityBreachException.class)
+    public ResponseEntity<ApiError> handleSecurityBreachException(SecurityBreachException exp)
+    {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(new ApiError(exp.getMessage()));
+    }
+
+    @ExceptionHandler(SessionExpiredException.class)
+    public ResponseEntity<ApiError> handleSessionExpiredException(SessionExpiredException exp)
+    {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(new ApiError(exp.getMessage()));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleGeneric(Exception ex) {
+
+        ex.printStackTrace();
+
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ApiError("Internal Server Error"));

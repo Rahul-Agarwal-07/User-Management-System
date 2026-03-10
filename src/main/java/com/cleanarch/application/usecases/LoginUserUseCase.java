@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 public class LoginUserUseCase implements LoginUseCasePort {
 
@@ -59,15 +60,22 @@ public class LoginUserUseCase implements LoginUseCasePort {
         }
 
         // Generate Refresh Token and Token hash
-        String refreshToken = tokenGenerator.generateRefreshToken(user.getId());
+
+        UUID sessionId = UUID.randomUUID();
+
+        String refreshToken = tokenGenerator.generateRefreshToken(user.getId(), sessionId);
         String refreshTokenHash = tokenHasher.hash(refreshToken);
 
 
         // Create new Session
         Session session = Session.create(
+                sessionId,
                 user.getId(),
                 refreshTokenHash,
-                Instant.now().plus(30, ChronoUnit.DAYS)
+                Instant.now().plus(30, ChronoUnit.DAYS),
+                command.deviceId(),
+                command.ipAddress(),
+                command.userAgent()
         );
 
         sessionRepository.save(session);

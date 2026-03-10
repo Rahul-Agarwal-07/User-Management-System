@@ -3,6 +3,7 @@ package com.cleanarch.adapters.out.security;
 import com.cleanarch.application.port.out.TokenGeneratorPort;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.time.Instant;
@@ -38,11 +39,12 @@ public class JwtTokenAdapter implements TokenGeneratorPort {
     }
 
     @Override
-    public String generateRefreshToken(UUID userId) {
+    public String generateRefreshToken(UUID userId, UUID sessionId) {
         Instant now = Instant.now();
 
         return Jwts.builder()
                 .subject(userId.toString())
+                .claim("sid", sessionId)
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plusSeconds(refreshTokenExpiration)))
                 .issuer("cleanarch-api")

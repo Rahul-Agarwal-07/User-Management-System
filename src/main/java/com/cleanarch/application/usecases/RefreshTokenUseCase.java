@@ -11,12 +11,15 @@ import com.cleanarch.domain.exception.InvalidRefreshTokenException;
 import com.cleanarch.domain.exception.RefreshTokenReuseDetectionException;
 import com.cleanarch.domain.exception.SecurityBreachException;
 import com.cleanarch.domain.model.Session;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Optional;
 import java.util.UUID;
 
 public class RefreshTokenUseCase implements RefreshTokenUseCasePort {
 
+    private static final Logger log = LogManager.getLogger(RefreshTokenUseCase.class);
     private final SessionRepositoryPort sessionRepository;
     private final TokenParserPort tokenParser;
     private final TokenGeneratorPort tokenGenerator;
@@ -34,6 +37,8 @@ public class RefreshTokenUseCase implements RefreshTokenUseCasePort {
 
         // Parsing token and fetching session id
         UUID sessionId = tokenParser.extractSessionId(command.refreshToken());
+
+        log.debug("Session Id {}", sessionId);
 
         if(sessionId == null) throw new InvalidRefreshTokenException();
 
@@ -55,7 +60,7 @@ public class RefreshTokenUseCase implements RefreshTokenUseCasePort {
         }
 
         // generate refresh token, hash and save the updated session
-        String newRefreshToken = tokenGenerator.generateRefreshToken(session.getUserId());
+        String newRefreshToken = tokenGenerator.generateRefreshToken(session.getUserId(), sessionId);
         String newHash = tokenHasher.hash(newRefreshToken);
 
         session.rotateRefreshToken(newHash);

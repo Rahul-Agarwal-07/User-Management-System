@@ -1,5 +1,7 @@
 package com.cleanarch.adapters.in.web.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public record RefreshTokenRequest(
-        String refreshToken
+        @NotBlank String refreshToken
 ) { }

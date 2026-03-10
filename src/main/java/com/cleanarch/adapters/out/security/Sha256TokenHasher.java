@@ -1,10 +1,12 @@
 package com.cleanarch.adapters.out.security;
 
 import com.cleanarch.application.port.out.TokenHasherPort;
+import org.springframework.stereotype.Component;
 
 import java.security.MessageDigest;
 import java.util.Base64;
 
+@Component
 public class Sha256TokenHasher implements TokenHasherPort {
 
     @Override

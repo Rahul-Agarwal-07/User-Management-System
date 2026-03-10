@@ -8,11 +8,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class BcryptPasswordHasherAdapter implements PasswordHasherPort {
 
+    private final PasswordEncoder passwordEncoder;
 
-    private final BCryptPasswordEncoder passwordEncoder;
-
-    public BcryptPasswordHasherAdapter(BcryptPasswordHasherAdapter passwordEncoder) {
-        this.passwordEncoder = new BCryptPasswordEncoder();
+    public BcryptPasswordHasherAdapter(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override

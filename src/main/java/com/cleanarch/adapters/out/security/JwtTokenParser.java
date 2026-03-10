@@ -1,9 +1,12 @@
 package com.cleanarch.adapters.out.security;
 
 import com.cleanarch.application.port.out.TokenParserPort;
+import com.cleanarch.domain.exception.InvalidRefreshTokenException;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.UUID;
@@ -18,11 +21,20 @@ public class JwtTokenParser implements TokenParserPort {
 
     @Override
     public UUID extractSessionId(String refreshToken) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(key)
-                .parseClaimsJws(refreshToken)
-                .getBody();
 
-        return UUID.fromString(claims.get("sid", String.class));
+        try {
+
+            Claims claims = Jwts.parser()
+                    .verifyWith(key)
+                    .build()
+                    .parseSignedClaims(refreshToken)
+                    .getPayload();
+
+            return UUID.fromString(claims.get("sid", String.class));
+
+        } catch (Exception e)
+        {
+            throw new InvalidRefreshTokenException();
+        }
     }
 }

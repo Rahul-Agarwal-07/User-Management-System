@@ -4,12 +4,14 @@ import com.cleanarch.adapters.out.persistence.entity.SessionEntity;
 import com.cleanarch.adapters.out.persistence.mapper.SessionMapper;
 import com.cleanarch.application.port.out.SessionRepositoryPort;
 import com.cleanarch.domain.model.Session;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Component
 public class SessionRepositoryAdapter implements SessionRepositoryPort {
 
     private final JpaSessionRepository jpaSessionRepository;
