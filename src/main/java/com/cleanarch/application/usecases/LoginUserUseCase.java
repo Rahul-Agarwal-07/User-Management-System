@@ -91,7 +91,7 @@ public class LoginUserUseCase implements LoginUseCasePort {
                 accessToken,
                 refreshToken,
                 user.getId(),
-                user.getStatus().name()
+                "USER"
         );
     }
 }
