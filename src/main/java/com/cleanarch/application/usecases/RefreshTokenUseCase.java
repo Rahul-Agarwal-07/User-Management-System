@@ -10,6 +10,7 @@ import com.cleanarch.application.port.out.TokenParserPort;
 import com.cleanarch.domain.exception.InvalidRefreshTokenException;
 import com.cleanarch.domain.exception.RefreshTokenReuseDetectionException;
 import com.cleanarch.domain.exception.SecurityBreachException;
+import com.cleanarch.domain.exception.SessionRevokedException;
 import com.cleanarch.domain.model.Session;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -57,6 +58,10 @@ public class RefreshTokenUseCase implements RefreshTokenUseCasePort {
         {
             sessionRepository.revokeAllByUserId(session.getUserId());
             throw new SecurityBreachException();
+
+        } catch (SessionRevokedException e)
+        {
+            throw new SecurityBreachException(e.getMessage());
         }
 
         // generate refresh token, hash and save the updated session

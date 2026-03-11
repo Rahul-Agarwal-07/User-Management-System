@@ -117,6 +117,8 @@ public class LoginUseCaseTest {
                 InvalidCredentialsException.class,
                 () -> loginUserUseCase.execute(command)
         );
+
+        verify(sessionRepository, never()).save(any());
     }
 
     @Test

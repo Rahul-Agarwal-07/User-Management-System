@@ -3,6 +3,7 @@ package com.cleanarch.domain.model;
 import com.cleanarch.domain.exception.InvalidRefreshTokenException;
 import com.cleanarch.domain.exception.RefreshTokenReuseDetectionException;
 import com.cleanarch.domain.exception.SessionExpiredException;
+import com.cleanarch.domain.exception.SessionRevokedException;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -145,7 +146,7 @@ public class Session {
     private void ensureSessionActive()
     {
         if(status == SessionStatus.REVOKED)
-            throw new SessionExpiredException();
+            throw new SessionRevokedException();
 
         if(status == SessionStatus.COMPROMISED)
             throw new RefreshTokenReuseDetectionException();
