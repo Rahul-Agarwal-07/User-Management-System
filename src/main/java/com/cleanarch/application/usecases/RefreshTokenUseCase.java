@@ -7,10 +7,7 @@ import com.cleanarch.application.port.out.SessionRepositoryPort;
 import com.cleanarch.application.port.out.TokenGeneratorPort;
 import com.cleanarch.application.port.out.TokenHasherPort;
 import com.cleanarch.application.port.out.TokenParserPort;
-import com.cleanarch.domain.exception.InvalidRefreshTokenException;
-import com.cleanarch.domain.exception.RefreshTokenReuseDetectionException;
-import com.cleanarch.domain.exception.SecurityBreachException;
-import com.cleanarch.domain.exception.SessionRevokedException;
+import com.cleanarch.domain.exception.*;
 import com.cleanarch.domain.model.Session;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,7 +38,7 @@ public class RefreshTokenUseCase implements RefreshTokenUseCasePort {
 
         log.debug("Session Id {}", sessionId);
 
-        if(sessionId == null) throw new InvalidRefreshTokenException();
+        if (sessionId == null) throw new InvalidRefreshTokenException();
 
         // Fetching session using session id
         Session session = sessionRepository.findById(sessionId)
@@ -54,14 +51,19 @@ public class RefreshTokenUseCase implements RefreshTokenUseCasePort {
 
             session.verifyRefreshToken(tokenHash);
 
-        } catch(RefreshTokenReuseDetectionException e)
-        {
+        } catch (RefreshTokenReuseDetectionException e) {
+
             sessionRepository.revokeAllByUserId(session.getUserId());
             throw new SecurityBreachException();
 
-        } catch (SessionRevokedException e)
-        {
+        } catch (SessionRevokedException e) {
+
             throw new SecurityBreachException(e.getMessage());
+
+        } catch (SessionExpiredException | InvalidRefreshTokenException e)
+        {
+            sessionRepository.save(session);
+            throw e;
         }
 
         // generate refresh token, hash and save the updated session

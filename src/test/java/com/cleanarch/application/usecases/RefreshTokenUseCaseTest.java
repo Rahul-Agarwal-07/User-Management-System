@@ -9,6 +9,7 @@ import com.cleanarch.application.port.out.TokenParserPort;
 import com.cleanarch.domain.exception.InvalidRefreshTokenException;
 import com.cleanarch.domain.exception.RefreshTokenReuseDetectionException;
 import com.cleanarch.domain.exception.SecurityBreachException;
+import com.cleanarch.domain.exception.SessionExpiredException;
 import com.cleanarch.domain.model.Session;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -149,7 +150,41 @@ public class RefreshTokenUseCaseTest {
         );
 
         verify(sessionRepository).revokeAllByUserId(userId);
+    }
 
+    @Test
+    public void should_throw_session_expired_when_token_is_expired()
+    {
+        UUID sessionId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+
+        Session session = Session.create(
+                sessionId,
+                userId,
+                "hashed-token",
+                Instant.now(),
+                "device123",
+                "0.0.0.1",
+                "Chrome"
+        );
+
+        RefreshTokenCommand command = new RefreshTokenCommand("refresh-token");
+
+        when(tokenParser.extractSessionId(command.refreshToken()))
+                .thenReturn(sessionId);
+
+        when(sessionRepository.findById(sessionId))
+                .thenReturn(Optional.of(session));
+
+        when(tokenHasher.hash(command.refreshToken()))
+                .thenReturn("hashed-token");
+
+        assertThrows(
+                SessionExpiredException.class,
+                () -> refreshTokenUseCase.execute(command)
+        );
+
+        verify(sessionRepository).save(any(Session.class));
     }
 
 }
