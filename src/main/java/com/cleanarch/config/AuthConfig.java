@@ -1,5 +1,8 @@
 package com.cleanarch.config;
 
+import com.cleanarch.adapters.out.security.JwtGeneratorAdapter;
+import com.cleanarch.adapters.out.security.JwtTokenParser;
+import com.cleanarch.adapters.out.security.jwt.JwtAdapter;
 import com.cleanarch.application.usecases.*;
 import com.cleanarch.application.port.out.*;
 import org.springframework.context.annotation.Bean;
@@ -38,5 +41,30 @@ public class AuthConfig {
                 tokenGenerator,
                 tokenHasher
         );
+    }
+
+    @Bean
+    public LogoutUseCase logoutUseCase(
+            SessionRepositoryPort sessionRepository
+    ){
+        return new LogoutUseCase(sessionRepository);
+    }
+
+    @Bean
+    public JwtAdapter jwtAdapter(JwtProperties jwtProperties)
+    {
+        return new JwtAdapter(jwtProperties.getSecret());
+    }
+
+    @Bean
+    public TokenParserPort tokenParser(JwtProperties jwtProperties)
+    {
+        return new JwtTokenParser(jwtProperties.getSecret());
+    }
+
+    @Bean
+    public TokenGeneratorPort tokenGenerator(JwtProperties jwtProperties)
+    {
+        return new JwtGeneratorAdapter(jwtProperties.getSecret());
     }
 }

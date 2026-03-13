@@ -3,21 +3,20 @@ package com.cleanarch.adapters.out.security;
 import com.cleanarch.application.port.out.TokenGeneratorPort;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
 
-public class JwtTokenAdapter implements TokenGeneratorPort {
+public class JwtGeneratorAdapter implements TokenGeneratorPort {
 
     private final SecretKey key;
 
     private final long accessTokenExpiration = 15 * 60;
     private final long refreshTokenExpiration = 30 * 24 * 60 * 60;
 
-    public JwtTokenAdapter(String key) {
+    public JwtGeneratorAdapter(String key) {
         this.key = Keys.hmacShaKeyFor(key.getBytes());
     }
 

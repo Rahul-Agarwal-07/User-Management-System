@@ -4,10 +4,12 @@ import com.cleanarch.adapters.in.web.dto.LoginUserRequest;
 import com.cleanarch.adapters.in.web.dto.LoginUserResponse;
 import com.cleanarch.adapters.in.web.dto.RefreshTokenRequest;
 import com.cleanarch.adapters.in.web.dto.RefreshTokenResponse;
+import com.cleanarch.adapters.out.security.principal.AuthUser;
 import com.cleanarch.application.port.in.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,11 +21,13 @@ public class AuthController {
 
     private final LoginUseCasePort loginUseCase;
     private final RefreshTokenUseCasePort refreshTokenUseCase;
+    private final LogoutUseCasePort logoutUseCase;
 
 
-    public AuthController(LoginUseCasePort loginUseCase, RefreshTokenUseCasePort refreshTokenUseCase) {
+    public AuthController(LoginUseCasePort loginUseCase, RefreshTokenUseCasePort refreshTokenUseCase, LogoutUseCasePort logoutUseCase) {
         this.loginUseCase = loginUseCase;
         this.refreshTokenUseCase = refreshTokenUseCase;
+        this.logoutUseCase = logoutUseCase;
     }
 
     @PostMapping("/login")
@@ -71,5 +75,18 @@ public class AuthController {
                         result.accessToken()
                 )
         );
+    }
+
+    @PostMapping("/logout")
+    ResponseEntity<Void> logout(@AuthenticationPrincipal AuthUser principal)
+    {
+        LogoutCommand command = new LogoutCommand(
+                principal.sessionId(),
+                principal.userId()
+        );
+
+        logoutUseCase.execute(command);
+
+        return ResponseEntity.noContent().build();
     }
 }

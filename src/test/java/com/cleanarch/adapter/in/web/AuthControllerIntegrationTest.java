@@ -122,7 +122,18 @@ public class AuthControllerIntegrationTest {
         // second refresh with previous body should detect reuse
         ResponseEntity<Map> secondRefresh = restTemplate.postForEntity(refreshUrl, refreshBody, Map.class);
         assertEquals(HttpStatus.FORBIDDEN, secondRefresh.getStatusCode());
-
     }
 
+    @Test
+    void should_reject_invalid_refresh_token()
+    {
+        String refreshUrl = "http://localhost:" + port + "/auth/refresh";
+
+        Map<String, String> refreshBody = Map.of(
+                "refreshToken", "invalid-token"
+        );
+
+        ResponseEntity<Map> refreshResponse = restTemplate.postForEntity(refreshUrl, refreshBody, Map.class);
+        assertEquals(HttpStatus.UNAUTHORIZED, refreshResponse.getStatusCode());
+    }
 }

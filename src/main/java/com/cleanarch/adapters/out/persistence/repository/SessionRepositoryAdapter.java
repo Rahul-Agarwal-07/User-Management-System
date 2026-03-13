@@ -36,6 +36,12 @@ public class SessionRepositoryAdapter implements SessionRepositoryPort {
     }
 
     @Override
+    public Optional<Session> findByIdAndUserId(UUID sessionId, UUID userId) {
+        return jpaSessionRepository.findBySessionIdAndUserId(sessionId, userId)
+                .map(SessionMapper::toDomain);
+    }
+
+    @Override
     public List<Session> findActiveSessionsByUserId(UUID userId) {
         return jpaSessionRepository.findByUserIdAndStatus(userId, "ACTIVE")
                 .stream()

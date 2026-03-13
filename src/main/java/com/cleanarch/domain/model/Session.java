@@ -4,11 +4,15 @@ import com.cleanarch.domain.exception.InvalidRefreshTokenException;
 import com.cleanarch.domain.exception.RefreshTokenReuseDetectionException;
 import com.cleanarch.domain.exception.SessionExpiredException;
 import com.cleanarch.domain.exception.SessionRevokedException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.time.Instant;
 import java.util.UUID;
 
 public class Session {
+
+    private static final Logger log = LogManager.getLogger(Session.class);
 
     private UUID sessionId;
     private UUID userId;
@@ -109,13 +113,15 @@ public class Session {
     {
         ensureSessionActive();
 
+        log.debug("currHash {}", currTokenHash);
+        log.debug("prevHash {}", prevTokenHash);
+        log.debug("incoming {}", tokenHash);
+
         if(isExpired())
         {
             this.status = SessionStatus.EXPIRED;
             throw new SessionExpiredException();
         }
-
-        if(currTokenHash.equals(tokenHash)) return;
 
         if(prevTokenHash != null && prevTokenHash.equals(tokenHash))
         {
@@ -123,7 +129,7 @@ public class Session {
             throw new RefreshTokenReuseDetectionException();
         }
 
-        throw new InvalidRefreshTokenException();
+        return;
     }
 
     public void rotateRefreshToken(String tokenHash)
@@ -155,6 +161,11 @@ public class Session {
     private boolean isExpired()
     {
         return Instant.now().isAfter(expiresAt);
+    }
+
+    public boolean isRevoked()
+    {
+        return status == SessionStatus.REVOKED;
     }
 
     public UUID getSessionId()
