@@ -7,9 +7,11 @@ import com.cleanarch.application.port.out.UserRepositoryPort;
 import com.cleanarch.domain.exception.InvalidUserDataException;
 import com.cleanarch.domain.exception.UserAlreadyExistsException;
 import com.cleanarch.domain.model.User;
+import jakarta.transaction.Transactional;
+
 import java.util.UUID;
 
-
+@Transactional
 public class CreateUserUseCase implements CreateUserUseCasePort {
 
 

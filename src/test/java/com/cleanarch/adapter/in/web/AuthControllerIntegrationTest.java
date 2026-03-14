@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -135,5 +137,32 @@ public class AuthControllerIntegrationTest {
 
         ResponseEntity<Map> refreshResponse = restTemplate.postForEntity(refreshUrl, refreshBody, Map.class);
         assertEquals(HttpStatus.UNAUTHORIZED, refreshResponse.getStatusCode());
+    }
+
+    @Test
+    void should_logout_user_successfully()
+    {
+        String loginUrl = "http://localhost:" + port + "/auth/login";
+
+        Map<String, String> loginBody = Map.of(
+                "email" , "rahul@example.com",
+                "password", "mypassword",
+                "deviceId", "chrome",
+                "userAgent", "chrome windows"
+        );
+
+        ResponseEntity<Map> loginResponse = restTemplate.postForEntity(loginUrl, loginBody, Map.class);
+
+        String accessToken = (String) loginResponse.getBody().get("accessToken");
+
+        String logoutUrl = "http://localhost:" + port + "/auth/logout";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+
+        ResponseEntity<Map> logoutResponse = restTemplate.postForEntity(logoutUrl, request, Map.class);
+        assertEquals(HttpStatus.NO_CONTENT, logoutResponse.getStatusCode());
     }
 }

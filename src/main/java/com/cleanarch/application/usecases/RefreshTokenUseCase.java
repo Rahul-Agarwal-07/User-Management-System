@@ -9,12 +9,14 @@ import com.cleanarch.application.port.out.TokenHasherPort;
 import com.cleanarch.application.port.out.TokenParserPort;
 import com.cleanarch.domain.exception.*;
 import com.cleanarch.domain.model.Session;
+import jakarta.transaction.Transactional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Optional;
 import java.util.UUID;
 
+@Transactional
 public class RefreshTokenUseCase implements RefreshTokenUseCasePort {
 
     private static final Logger log = LogManager.getLogger(RefreshTokenUseCase.class);

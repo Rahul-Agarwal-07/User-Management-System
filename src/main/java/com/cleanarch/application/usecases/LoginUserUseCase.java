@@ -7,6 +7,7 @@ import com.cleanarch.application.port.out.*;
 import com.cleanarch.domain.exception.InvalidCredentialsException;
 import com.cleanarch.domain.model.Session;
 import com.cleanarch.domain.model.User;
+import jakarta.transaction.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -14,6 +15,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
+@Transactional
 public class LoginUserUseCase implements LoginUseCasePort {
 
     private static final int MAX_SESSIONS = 3;

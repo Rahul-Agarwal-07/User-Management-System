@@ -5,7 +5,9 @@ import com.cleanarch.application.port.in.LogoutUseCasePort;
 import com.cleanarch.application.port.out.SessionRepositoryPort;
 import com.cleanarch.domain.model.Session;
 import com.cleanarch.domain.model.SessionStatus;
+import jakarta.transaction.Transactional;
 
+@Transactional
 public class LogoutUseCase implements LogoutUseCasePort {
 
     private final SessionRepositoryPort sessionRepository;
