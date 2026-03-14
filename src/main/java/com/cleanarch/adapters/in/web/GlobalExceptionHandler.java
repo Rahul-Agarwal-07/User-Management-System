@@ -70,6 +70,22 @@ public class GlobalExceptionHandler {
                 .body(new ApiError(exp.getMessage()));
     }
 
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<ApiError> handleInvalidPasswordException(InvalidPasswordException exp)
+    {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ApiError(exp.getMessage()));
+    }
+
+    @ExceptionHandler(PasswordPolicyViolationException.class)
+    public ResponseEntity<ApiError> handlePasswordPolicyViolationException(PasswordPolicyViolationException exp)
+    {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ApiError(exp.getMessage()));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleGeneric(Exception ex) {
 
